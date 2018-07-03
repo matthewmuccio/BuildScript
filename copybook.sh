@@ -15,14 +15,14 @@
 # +***+**++*+++***+++*|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|*+++***+++*++**+***+ #
 #                                                                              #
 # You will need the following information:                                     #
-# ~ your email address (hereafter: <email_addr>)                               #
-# ~ your server's internet protocol address (hereafter: <vps_ip_addr>)         #
-# ~ your server's name (hereafter: <vps_name>)                                 #
+# ~ your email address (hereafter: me@matthewmuccio.com)                       #
+# ~ your server's internet protocol address (hereafter: 178.128.156.248)       #
+# ~ your server's name (hereafter: byte-example)                               #
 #                                                                              #
 # Be advised:                                                                  #
-# ~ <os_username> must be a string that is not "root"                          #
-# ~ <os_password> should be a string that is longer than eight characters      #
-# ~ <defined_ssh_port> must be an integer that is between 1024 and 65535       #
+# ~ matthewmuccio must be a string that is not "root"                          #
+# ~ picklefishlips! should be a string that is longer than eight characters    #
+# ~ 6174 must be an integer that is between 1024 and 65535                     #
 #                                                                              #
 ################################################################################
 
@@ -34,9 +34,9 @@
 
 ssh-keygen -t rsa
 
-sh -c 'echo "<os_username>:<os_password>" >> .credentials'
+sh -c 'echo "matthewmuccio:picklefishlips!" >> .credentials'
 
-ssh root@<vps_ip_addr>
+ssh root@178.128.156.248
 
 # ::|\ ________ /|:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::| |        | |:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
@@ -52,13 +52,13 @@ sh -c 'echo "set tabsize 8" >> .nanorc'
 
 sh -c 'echo "set tabstospaces" >> .nanorc'
 
-adduser --disabled-password --gecos "" <os_username>
+adduser --disabled-password --gecos "" matthewmuccio
 
-usermod -aG sudo <os_username>
+usermod -aG sudo matthewmuccio
 
-cp .nanorc /home/<os_username>/
+cp .nanorc /home/matthewmuccio/
 
-mkdir /etc/ssh/<os_username>
+mkdir /etc/ssh/matthewmuccio
 
 exit
 
@@ -68,11 +68,11 @@ exit
 # ::| !_______! |::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::!/         \!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-scp .ssh/id_rsa.pub root@<vps_ip_addr>:/etc/ssh/<os_username>/authorized_keys
+scp .ssh/id_rsa.pub root@178.128.156.248:/etc/ssh/matthewmuccio/authorized_keys
 
-scp .credentials root@<vps_ip_addr>:/home/<os_username>/
+scp .credentials root@178.128.156.248:/home/matthewmuccio/
 
-ssh root@<vps_ip_addr>
+ssh root@178.128.156.248
 
 # ::|\ ________ /|:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::| |        | |:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
@@ -80,13 +80,13 @@ ssh root@<vps_ip_addr>
 # ::| !________! |:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::!/          \!:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-chown -R <os_username>:<os_username> /etc/ssh/<os_username>
+chown -R matthewmuccio:matthewmuccio /etc/ssh/matthewmuccio
 
-chmod 755 /etc/ssh/<os_username>
+chmod 755 /etc/ssh/matthewmuccio
 
-chmod 644 /etc/ssh/<os_username>/authorized_keys
+chmod 644 /etc/ssh/matthewmuccio/authorized_keys
 
-sed -i -e '/^#AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile \/etc\/ssh\/<os_username>\/authorized_keys/' /etc/ssh/sshd_config
+sed -i -e '/^#AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile \/etc\/ssh\/matthewmuccio\/authorized_keys/' /etc/ssh/sshd_config
 
 sed -i -e '/^PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
 
@@ -98,7 +98,7 @@ sh -c 'echo "" >> /etc/ssh/sshd_config'
 
 sh -c 'echo "# Added by Katabasis build process" >> /etc/ssh/sshd_config'
 
-sh -c 'echo "AllowUsers <os_username>" >> /etc/ssh/sshd_config'
+sh -c 'echo "AllowUsers matthewmuccio" >> /etc/ssh/sshd_config'
 
 systemctl reload sshd
 
@@ -110,9 +110,9 @@ firewall-cmd --reload
 
 systemctl enable firewalld
 
-sed -i -e '/^Port/s/^.*$/Port <defined_ssh_port>/' /etc/ssh/sshd_config
+sed -i -e '/^Port/s/^.*$/Port 6174/' /etc/ssh/sshd_config
 
-firewall-cmd --add-port <defined_ssh_port>/tcp --permanent
+firewall-cmd --add-port 6174/tcp --permanent
 
 firewall-cmd --reload
 
@@ -352,9 +352,9 @@ sh -c 'echo "findtime = 1200" >> /etc/fail2ban/jail.local'
 
 sh -c 'echo "maxretry = 3" >> /etc/fail2ban/jail.local'
 
-sh -c 'echo "destemail = <email_addr>" >> /etc/fail2ban/jail.local'
+sh -c 'echo "destemail = me@matthewmuccio.com" >> /etc/fail2ban/jail.local'
 
-sh -c 'echo "sendername = security@<vps_name>" >> /etc/fail2ban/jail.local'
+sh -c 'echo "sendername = security@byte-example" >> /etc/fail2ban/jail.local'
 
 sh -c 'echo "banaction = iptables-multiport" >> /etc/fail2ban/jail.local'
 
@@ -384,9 +384,9 @@ sh -c 'echo "enabled = true" >> /etc/fail2ban/jail.local'
 
 systemctl restart fail2ban
 
-cat /home/<os_username>/.credentials | chpasswd
+cat /home/matthewmuccio/.credentials | chpasswd
 
-rm /home/<os_username>/.credentials
+rm /home/matthewmuccio/.credentials
 
 sudo apt-get -y install postgresql postgresql-contrib
 
@@ -394,15 +394,15 @@ su - postgres
 
 psql
 
-CREATE USER <os_username> WITH PASSWORD '<os_password>';
+CREATE USER matthewmuccio WITH PASSWORD 'picklefishlips!';
 
-CREATE DATABASE master OWNER <os_username>;
+CREATE DATABASE master OWNER matthewmuccio;
 
 \q
 
-su - <os_username>
+su - matthewmuccio
 
-<os_password>
+picklefishlips!
 
 psql master
 
