@@ -32,7 +32,14 @@
 # ::| !_______! |::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::!/         \!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-ssh-keygen -t rsa
+# We already created a public and private key.
+#ssh-keygen -t rsa
+
+# Adding these lines.
+mkdir ~/BuildScript
+
+cd ~/BuildScript
+#
 
 sh -c 'echo "matthewmuccio:picklefishlips!" >> .credentials'
 
@@ -68,7 +75,7 @@ exit
 # ::| !_______! |::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::!/         \!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-scp .ssh/id_rsa.pub root@178.128.156.248:/etc/ssh/matthewmuccio/authorized_keys
+scp ~/.ssh/id_rsa.pub root@178.128.156.248:/etc/ssh/matthewmuccio/authorized_keys
 
 scp .credentials root@178.128.156.248:/home/matthewmuccio/
 
@@ -166,7 +173,7 @@ sh -c 'echo "geoip_country /usr/share/GeoIP/GeoIP.dat;" >> /etc/nginx/conf\.d/ge
 
 sed -i '/# Default server configuration/a \}' /etc/nginx/sites-available/default
 
-sed -i '/# Default server configuration/a US yes;' /etc/nginx/sites-available/default
+sed -i '/# Default server configuration/a US yes;' /etc/ngrm inx/sites-available/default
 
 sed -i '/# Default server configuration/a default no;' /etc/nginx/sites-available/default
 
@@ -388,6 +395,8 @@ cat /home/matthewmuccio/.credentials | chpasswd
 
 rm /home/matthewmuccio/.credentials
 
+# PostgreSQL set-up and configuration (not needed for our purposes).
+: '
 sudo apt-get -y install postgresql postgresql-contrib
 
 su - postgres
@@ -425,3 +434,4 @@ volume integer
 );
 
 git clone git://github.com/katabasis/katabasis.git
+'
