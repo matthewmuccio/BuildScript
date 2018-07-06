@@ -16,7 +16,7 @@
 #                                                                              #
 # You will need the following information:                                     #
 # ~ your email address (hereafter: me@matthewmuccio.com)                       #
-# ~ your server's internet protocol address (hereafter: 178.128.156.248)       #
+# ~ your server's internet protocol address (hereafter: 178.128.158.22)       #
 # ~ your server's name (hereafter: byte-example)                               #
 #                                                                              #
 # Be advised:                                                                  #
@@ -32,18 +32,18 @@
 # ::| !_______! |::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::!/         \!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-# We already created a public and private key.
-#ssh-keygen -t rsa
+# Skip line if the machine in use has already created a public and private key.
+ssh-keygen -t rsa
 
-# Adding these lines.
 mkdir ~/BuildScript
 
 cd ~/BuildScript
-#
 
-sh -c 'echo "matthewmuccio:picklefishlips!" >> .credentials'
+# Going forward assuming that a the web server (droplet) is created via the dashboard or a series of cURLs.
 
-ssh root@178.128.156.248
+sh -c 'echo "matthewmuccio:picklefishlips!" > .credentials'
+
+ssh root@178.128.158.22
 
 # ::|\ ________ /|:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::| |        | |:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
@@ -59,6 +59,7 @@ sh -c 'echo "set tabsize 8" >> .nanorc'
 
 sh -c 'echo "set tabstospaces" >> .nanorc'
 
+# Creates a user and group named "matthewmuccio."
 adduser --disabled-password --gecos "" matthewmuccio
 
 usermod -aG sudo matthewmuccio
@@ -75,11 +76,12 @@ exit
 # ::| !_______! |::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::!/         \!::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 
-scp ~/.ssh/id_rsa.pub root@178.128.156.248:/etc/ssh/matthewmuccio/authorized_keys
+# Adds root to path.
+scp ~/.ssh/id_rsa.pub root@178.128.158.22:/etc/ssh/matthewmuccio/authorized_keys
 
-scp .credentials root@178.128.156.248:/home/matthewmuccio/
+scp .credentials root@178.128.158.22:/home/matthewmuccio/
 
-ssh root@178.128.156.248
+ssh root@178.128.158.22
 
 # ::|\ ________ /|:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # ::| |        | |:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
@@ -93,6 +95,7 @@ chmod 755 /etc/ssh/matthewmuccio
 
 chmod 644 /etc/ssh/matthewmuccio/authorized_keys
 
+# Adds items to the SSH daemon configuration.
 sed -i -e '/^#AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile \/etc\/ssh\/matthewmuccio\/authorized_keys/' /etc/ssh/sshd_config
 
 sed -i -e '/^PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
@@ -109,6 +112,7 @@ sh -c 'echo "AllowUsers matthewmuccio" >> /etc/ssh/sshd_config'
 
 systemctl reload sshd
 
+# Firewalld installation, configuration, and set-up.
 apt-get -y install firewalld
 
 systemctl start firewalld
@@ -127,6 +131,7 @@ systemctl reload sshd
 
 timedatectl set-timezone America/New_York
 
+# Network time protocol (NTP) installation, configuration, and set-up.
 apt-get -y install ntp
 
 fallocate -l 3G /swapfile
@@ -145,6 +150,7 @@ sysctl vm.vfs_cache_pressure=30
 
 sh -c 'echo "vm.vfs_cache_pressure=30" >> /etc/sysctl.conf'
 
+# NGINX installation, configuration, and set-up.
 apt-get -y install nginx
 
 sh -c 'echo "log_format timekeeper \$remote_addr - \$remote_user [\$time_local] " >> /etc/nginx/conf.d/timekeeper-log-format.conf'
@@ -169,6 +175,7 @@ sed -i "s/\$http_x_forwarded_for/\"\$http_x_forwarded_for\"/" /etc/nginx/conf.d/
 
 sed -i "s/_time;/_time\';/" /etc/nginx/conf.d/timekeeper-log-format.conf
 
+# Geo-fencing configuration and set-up.
 sh -c 'echo "geoip_country /usr/share/GeoIP/GeoIP.dat;" >> /etc/nginx/conf\.d/geoip.conf'
 
 sed -i '/# Default server configuration/a \}' /etc/nginx/sites-available/default
@@ -347,6 +354,7 @@ firewall-cmd --reload
 
 systemctl enable nginx
 
+# Fail2ban installation, configuration, and set-up.
 apt-get -y install fail2ban
 
 systemctl enable fail2ban
@@ -395,7 +403,7 @@ cat /home/matthewmuccio/.credentials | chpasswd
 
 rm /home/matthewmuccio/.credentials
 
-# PostgreSQL set-up and configuration (not needed for our purposes).
+# PostgreSQL installation, configuration, and set-up (may not be necessary).
 : '
 sudo apt-get -y install postgresql postgresql-contrib
 
